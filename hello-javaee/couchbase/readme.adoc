@@ -1,0 +1,17 @@
+= Pre-configured Couchbase Docker
+
+These are the artifacts to create a pre-configured Couchbase Docker image.
+
+== Build the image
+
+```console
+docker build -t arungupta/oreilly-couchbase:latest .
+```
+
+== Run the container
+
+Start the container as:
+
+```console
+docker run --name db -d -p 8091-8093:8091-8093 -p 11210:11210 arungupta/oreilly-couchbase
+```
