@@ -1,4 +1,4 @@
 FROM jboss/wildfly:latest
 
-ADD couchbase-javaee.war /opt/jboss/wildfly/standalone/deployments/airlines.war
+COPY javaee-nosql-sample/target/books.war /opt/jboss/wildfly/standalone/deployments/books.war
 
