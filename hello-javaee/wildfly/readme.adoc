@@ -1,0 +1,18 @@
+= WildFly Docker Container
+
+This WildFly image is used with `arungupta/oreilly-couchbase` image.
+
+== Build the image
+
+```console
+docker build -t arungupta/oreilly-wildfly:latest .
+```
+
+== Run the container
+
+Start the container as:
+
+```console
+docker run -e COUCHBASE_URI=db -d -p 8080:8080 arungupta/oreilly-wildfly
+```
+
