@@ -1,4 +1,4 @@
-= Pre-configured Couchbase Docker
+= Pre-configured Couchbase Docker Container
 
 These are the artifacts to create a pre-configured Couchbase Docker image.
 
