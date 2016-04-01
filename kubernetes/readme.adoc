@@ -1,0 +1,157 @@
+= Getting Started with multi-container application using Kubernetes on Amazon
+
+
+. Download Kubernetes release from https://github.com/kubernetes/kubernetes/releases/download/v1.2.0/kubernetes.tar.gz and extract it.
+. Start Kubernetes cluster: 
+
+[source, text]
+----
+kubernetes-1.2.0 > echo $KUBERNETES_PROVIDER 
+aws
+kubernetes-1.2.0 > ./kubernetes/cluster/kube-up.sh 
+... Starting cluster in us-west-2a using provider aws
+... calling verify-prereqs
+... calling kube-up
+Starting cluster using os distro: jessie
+Uploading to Amazon S3
++++ Staging server tars to S3 Storage: kubernetes-staging-0eaf81fbc51209dd47c13b6d8b424149/devel
+upload: ../../../../../var/folders/81/ttv4n16x7p390cttrm_675y00000gn/T/kubernetes.XXXXXX.R30yripR/s3/bootstrap-script to s3://kubernetes-staging-0eaf81fbc51209dd47c13b6d8b424149/devel/bootstrap-script
+Uploaded server tars:
+  SERVER_BINARY_TAR_URL: https://s3.amazonaws.com/kubernetes-staging-0eaf81fbc51209dd47c13b6d8b424149/devel/kubernetes-server-linux-amd64.tar.gz
+  SALT_TAR_URL: https://s3.amazonaws.com/kubernetes-staging-0eaf81fbc51209dd47c13b6d8b424149/devel/kubernetes-salt.tar.gz
+  BOOTSTRAP_SCRIPT_URL: https://s3.amazonaws.com/kubernetes-staging-0eaf81fbc51209dd47c13b6d8b424149/devel/bootstrap-script
+INSTANCEPROFILE	arn:aws:iam::598307997273:instance-profile/kubernetes-master	2016-02-29T23:19:19Z	AIPAJMNMKZSXNWXQBHXHI	kubernetes-master	/
+ROLES	arn:aws:iam::598307997273:role/kubernetes-master	2016-02-29T23:19:17Z	/	AROAJW7ER37BPXX5KFTFS	kubernetes-master
+ASSUMEROLEPOLICYDOCUMENT	2012-10-17
+STATEMENT	sts:AssumeRole	Allow
+PRINCIPAL	ec2.amazonaws.com
+INSTANCEPROFILE	arn:aws:iam::598307997273:instance-profile/kubernetes-minion	2016-02-29T23:19:22Z	AIPAILRAU7RF4R2SDCULG	kubernetes-minion	/
+ROLES	arn:aws:iam::598307997273:role/kubernetes-minion	2016-02-29T23:19:21Z	/	AROAIBEPV6VW4IEE6MRHS	kubernetes-minion
+ASSUMEROLEPOLICYDOCUMENT	2012-10-17
+STATEMENT	sts:AssumeRole	Allow
+PRINCIPAL	ec2.amazonaws.com
+Using SSH key with (AWS) fingerprint: 39:b3:cb:c1:af:6a:86:de:98:95:01:3d:9a:56:bb:8b
+Creating vpc.
+Adding tag to vpc-8d5b93e9: Name=kubernetes-vpc
+Adding tag to vpc-8d5b93e9: KubernetesCluster=kubernetes
+Using VPC vpc-8d5b93e9
+Adding tag to dopt-0bd6a96e: Name=kubernetes-dhcp-option-set
+Adding tag to dopt-0bd6a96e: KubernetesCluster=kubernetes
+Using DHCP option set dopt-0bd6a96e
+Creating subnet.
+Adding tag to subnet-91a370f5: KubernetesCluster=kubernetes
+Using subnet subnet-91a370f5
+Creating Internet Gateway.
+Using Internet Gateway igw-7e14361b
+Associating route table.
+Creating route table
+Adding tag to rtb-0570c561: KubernetesCluster=kubernetes
+Associating route table rtb-0570c561 to subnet subnet-91a370f5
+Adding route to route table rtb-0570c561
+Using Route Table rtb-0570c561
+Creating master security group.
+Creating security group kubernetes-master-kubernetes.
+Adding tag to sg-eea7dd89: KubernetesCluster=kubernetes
+Creating minion security group.
+Creating security group kubernetes-minion-kubernetes.
+Adding tag to sg-eba7dd8c: KubernetesCluster=kubernetes
+Using master security group: kubernetes-master-kubernetes sg-eea7dd89
+Using minion security group: kubernetes-minion-kubernetes sg-eba7dd8c
+Creating master disk: size 20GB, type gp2
+Adding tag to vol-22ded395: Name=kubernetes-master-pd
+Adding tag to vol-22ded395: KubernetesCluster=kubernetes
+Allocated Elastic IP for master: 52.38.156.103
+Adding tag to vol-22ded395: kubernetes.io/master-ip=52.38.156.103
+Generating certs for alternate-names: IP:52.38.156.103,IP:172.20.0.9,IP:10.0.0.1,DNS:kubernetes,DNS:kubernetes.default,DNS:kubernetes.default.svc,DNS:kubernetes.default.svc.cluster.local,DNS:kubernetes-master
+Starting Master
+Adding tag to i-a834046f: Name=kubernetes-master
+Adding tag to i-a834046f: Role=kubernetes-master
+Adding tag to i-a834046f: KubernetesCluster=kubernetes
+Waiting for master to be ready
+Attempt 1 to check for master nodeWaiting for instance i-a834046f to be running (currently pending)
+Sleeping for 3 seconds...
+Waiting for instance i-a834046f to be running (currently pending)
+Sleeping for 3 seconds...
+Waiting for instance i-a834046f to be running (currently pending)
+Sleeping for 3 seconds...
+Waiting for instance i-a834046f to be running (currently pending)
+Sleeping for 3 seconds...
+Waiting for instance i-a834046f to be running (currently pending)
+Sleeping for 3 seconds...
+Waiting for instance i-a834046f to be running (currently pending)
+Sleeping for 3 seconds...
+Waiting for instance i-a834046f to be running (currently pending)
+Sleeping for 3 seconds...
+Waiting for instance i-a834046f to be running (currently pending)
+Sleeping for 3 seconds...
+Waiting for instance i-a834046f to be running (currently pending)
+Sleeping for 3 seconds...
+ [master running]
+Attaching IP 52.38.156.103 to instance i-a834046f
+Attaching persistent data volume (vol-22ded395) to master
+2016-04-01T20:56:14.094Z	/dev/sdb	i-a834046f	attaching	vol-22ded395
+cluster "aws_kubernetes" set.
+user "aws_kubernetes" set.
+context "aws_kubernetes" set.
+switched to context "aws_kubernetes".
+user "aws_kubernetes-basic-auth" set.
+Wrote config for aws_kubernetes to /Users/arungupta/.kube/config
+Creating minion configuration
+Creating autoscaling group
+ 0 minions started; waiting
+ 0 minions started; waiting
+ 0 minions started; waiting
+ 0 minions started; waiting
+ 2 minions started; waiting
+ 2 minions started; waiting
+ 2 minions started; waiting
+ 4 minions started; ready
+Waiting for cluster initialization.
+
+  This will continually check to see if the API for kubernetes is reachable.
+  This might loop forever if there was some uncaught error during start
+  up.
+
+...................................................................................................................Kubernetes cluster created.
+Sanity checking cluster...
+Attempt 1 to check Docker on node @ 52.38.166.7 ...working
+Attempt 1 to check Docker on node @ 52.36.79.89 ...working
+Attempt 1 to check Docker on node @ 52.38.166.220 ...working
+Attempt 1 to check Docker on node @ 52.38.146.77 ...working
+
+Kubernetes cluster is running.  The master is running at:
+
+  https://52.38.156.103
+
+The user name and password to use is located in /Users/arungupta/.kube/config.
+
+... calling validate-cluster
+Waiting for 4 ready nodes. 0 ready nodes, 3 registered. Retrying.
+Waiting for 4 ready nodes. 1 ready nodes, 4 registered. Retrying.
+Waiting for 4 ready nodes. 3 ready nodes, 4 registered. Retrying.
+Found 4 node(s).
+NAME                                         STATUS    AGE
+ip-172-20-0-144.us-west-2.compute.internal   Ready     57s
+ip-172-20-0-145.us-west-2.compute.internal   Ready     57s
+ip-172-20-0-146.us-west-2.compute.internal   Ready     33s
+ip-172-20-0-147.us-west-2.compute.internal   Ready     54s
+Flag --api-version has been deprecated, flag is no longer respected and will be deleted in the next release
+Validate output:
+NAME                 STATUS    MESSAGE              ERROR
+controller-manager   Healthy   ok                   
+scheduler            Healthy   ok                   
+etcd-1               Healthy   {"health": "true"}   
+etcd-0               Healthy   {"health": "true"}   
+Cluster validation succeeded
+Done, listing cluster services:
+
+Kubernetes master is running at https://52.38.156.103
+Elasticsearch is running at https://52.38.156.103/api/v1/proxy/namespaces/kube-system/services/elasticsearch-logging
+Heapster is running at https://52.38.156.103/api/v1/proxy/namespaces/kube-system/services/heapster
+Kibana is running at https://52.38.156.103/api/v1/proxy/namespaces/kube-system/services/kibana-logging
+KubeDNS is running at https://52.38.156.103/api/v1/proxy/namespaces/kube-system/services/kube-dns
+kubernetes-dashboard is running at https://52.38.156.103/api/v1/proxy/namespaces/kube-system/services/kubernetes-dashboard
+Grafana is running at https://52.38.156.103/api/v1/proxy/namespaces/kube-system/services/monitoring-grafana
+InfluxDB is running at https://52.38.156.103/api/v1/proxy/namespaces/kube-system/services/monitoring-influxdb
+----
+
