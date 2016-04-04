@@ -41,7 +41,19 @@ public class Database {
 
     public CouchbaseCluster getCluster() {
         if (null == cluster) {
-            cluster = CouchbaseCluster.create(System.getenv("COUCHBASE_URI"));
+            // Docker environment
+            String couchbaseHost = System.getenv("COUCHBASE_URI");
+            if (couchbaseHost == null) {
+                System.out.println("Docker configuration not found, reading Kubernetes configuration ...");
+                // Kubernetes environment
+                couchbaseHost = System.getenv("COUCHBASE_SERVICE_SERVICE_HOST");
+                if (couchbaseHost == null)
+                    System.out.println("Kubernetes configuration not found");
+                else
+                    System.out.println("Kubernetes configuration found");
+            }
+            System.out.println("couchbaseHost: " + couchbaseHost);
+            cluster = CouchbaseCluster.create(couchbaseHost);
         }
         return cluster;
     }
