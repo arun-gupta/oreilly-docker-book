@@ -8,6 +8,12 @@ This WildFly image is used with `arungupta/oreilly-couchbase` image.
 docker build -t arungupta/oreilly-wildfly:latest .
 ```
 
+== Push the image
+
+```console
+docker push arungupta/oreilly-wildfly:latest
+```
+
 == Run the container
 
 Start the container as:
