@@ -1,0 +1,130 @@
+= Getting Started with Mesos + Marathon + Docker
+
+== ZooKeeper
+
+. Install ZooKeeper
++
+[source, text]
+----
+brew install zookeeper
+==> Downloading https://homebrew.bintray.com/bottles/zookeeper-3.4.7.yosemite.bottle.tar.gz
+#############                                                             19.3%I0403 20:27:27.060225 50475008 slave.cpp:4304] Current disk usage 80.88%. Max allowed age: 15.326435485133612hrs
+######################################################################## 100.0%
+==> Pouring zookeeper-3.4.7.yosemite.bottle.tar.gz
+==> Caveats
+To have launchd start zookeeper at login:
+  ln -sfv /usr/local/opt/zookeeper/*.plist ~/Library/LaunchAgents
+Then to load zookeeper now:
+  launchctl load ~/Library/LaunchAgents/homebrew.mxcl.zookeeper.plist
+Or, if you don't want/need launchctl, you can just run:
+  zkServer start
+==> Summary
+🍺  /usr/local/Cellar/zookeeper/3.4.7: 235 files, 17.1M
+----
++
+. Start ZooKeeper:
++
+[source, text]
+----
+zkServer start
+ZooKeeper JMX enabled by default
+Using config: /usr/local/etc/zookeeper/zoo.cfg
+Starting zookeeper ... STARTED
+----
+
+== Mesos
+
+=== Install Mesos
+
+[source, text]
+----
+brew install mesos
+==> Installing dependencies for mesos: sqlite, openssl, subversion
+==> Installing mesos dependency: sqlite
+==> Downloading https://homebrew.bintray.com/bottles/sqlite-3.11.0_1.yosemite.bottle.tar.gz
+######################################################################## 100.0%
+==> Pouring sqlite-3.11.0_1.yosemite.bottle.tar.gz
+==> Caveats
+This formula is keg-only, which means it was not symlinked into /usr/local.
+
+OS X provides an older sqlite3.
+
+Generally there are no consequences of this for you. If you build your
+own software and it requires this formula, you'll need to add to your
+build variables:
+
+    LDFLAGS:  -L/usr/local/opt/sqlite/lib
+    CPPFLAGS: -I/usr/local/opt/sqlite/include
+
+==> Summary
+🍺  /usr/local/Cellar/sqlite/3.11.0_1: 9 files, 2.8M
+==> Installing mesos dependency: openssl
+==> Downloading https://homebrew.bintray.com/bottles/openssl-1.0.2g.yosemite.bottle.tar.gz
+######################################################################## 100.0%
+==> Pouring openssl-1.0.2g.yosemite.bottle.tar.gz
+==> Caveats
+A CA file has been bootstrapped using certificates from the system
+keychain. To add additional certificates, place .pem files in
+  /usr/local/etc/openssl/certs
+
+and run
+  /usr/local/opt/openssl/bin/c_rehash
+
+This formula is keg-only, which means it was not symlinked into /usr/local.
+
+Apple has deprecated use of OpenSSL in favor of its own TLS and crypto libraries
+
+Generally there are no consequences of this for you. If you build your
+own software and it requires this formula, you'll need to add to your
+build variables:
+
+    LDFLAGS:  -L/usr/local/opt/openssl/lib
+    CPPFLAGS: -I/usr/local/opt/openssl/include
+
+==> Summary
+🍺  /usr/local/Cellar/openssl/1.0.2g: 466 files, 11.9M
+==> Installing mesos dependency: subversion
+==> Downloading https://homebrew.bintray.com/bottles/subversion-1.9.3.yosemite.bottle.1.tar.gz
+######################################################################## 100.0%
+==> Pouring subversion-1.9.3.yosemite.bottle.1.tar.gz
+==> Caveats
+svntools have been installed to:
+  /usr/local/opt/subversion/libexec
+
+Bash completion has been installed to:
+  /usr/local/etc/bash_completion.d
+==> Summary
+🍺  /usr/local/Cellar/subversion/1.9.3: 132 files, 11.1M
+==> Installing mesos
+==> Downloading https://homebrew.bintray.com/bottles/mesos-0.27.2.yosemite.bottle.tar.gz
+######################################################################## 100.0%
+==> Pouring mesos-0.27.2.yosemite.bottle.tar.gz
+🍺  /usr/local/Cellar/mesos/0.27.2: 841 files, 85.3M
+----
+
+=== Start Mesos Master
+
+[source, text]
+----
+/usr/local/sbin/mesos-master --registry=in_memory --ip=127.0.0.1 --zk=zk://127.0.0.1:2181/mesos --quorum=1
+----
+
+Mesos Web UI: http://127.0.0.1:5050/
+
+=== Start Mesos Slave
+
+[source, text]
+----
+/usr/local/sbin/mesos-slave --master=127.0.0.1:5050 --containerizers=docker,mesos --executor_registration_timeout=5mins
+----
+
+== Marathon
+
+[source, text]
+----
+curl -O http://downloads.mesosphere.com/marathon/v1.0.0-RC1/marathon-1.0.0-RC1.tgz
+tar xzvf marathon-1.0.0-RC1.tgz
+cd marathon-1.0.0-RC1
+./bin/start --master zk://127.0.0.1:2181/mesos --zk zk://127.0.0.1:2181/marathon
+----
+
