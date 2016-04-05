@@ -1,0 +1,6 @@
+= Docker and Maven
+
+This is a sample project that shows how to build Docker images and run Docker containers using Maven.
+
+More details: https://github.com/fabric8io/docker-maven-plugin
+
