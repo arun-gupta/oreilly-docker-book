@@ -1,130 +1,474 @@
 = Getting Started with Mesos + Marathon + Docker
 
-== ZooKeeper
+== Enable Ethernet on CentOS
 
-. Install ZooKeeper
-+
-[source, text]
-----
-brew install zookeeper
-==> Downloading https://homebrew.bintray.com/bottles/zookeeper-3.4.7.yosemite.bottle.tar.gz
-#############                                                             19.3%I0403 20:27:27.060225 50475008 slave.cpp:4304] Current disk usage 80.88%. Max allowed age: 15.326435485133612hrs
-######################################################################## 100.0%
-==> Pouring zookeeper-3.4.7.yosemite.bottle.tar.gz
-==> Caveats
-To have launchd start zookeeper at login:
-  ln -sfv /usr/local/opt/zookeeper/*.plist ~/Library/LaunchAgents
-Then to load zookeeper now:
-  launchctl load ~/Library/LaunchAgents/homebrew.mxcl.zookeeper.plist
-Or, if you don't want/need launchctl, you can just run:
-  zkServer start
-==> Summary
-🍺  /usr/local/Cellar/zookeeper/3.4.7: 235 files, 17.1M
-----
-+
-. Start ZooKeeper:
-+
-[source, text]
-----
-zkServer start
-ZooKeeper JMX enabled by default
-Using config: /usr/local/etc/zookeeper/zoo.cfg
-Starting zookeeper ... STARTED
-----
+http://www.krizna.com/centos/setup-network-centos-7/
 
-== Mesos
+== Install components
 
-=== Install Mesos
+=== Add Mesos repo
 
-[source, text]
-----
-brew install mesos
-==> Installing dependencies for mesos: sqlite, openssl, subversion
-==> Installing mesos dependency: sqlite
-==> Downloading https://homebrew.bintray.com/bottles/sqlite-3.11.0_1.yosemite.bottle.tar.gz
-######################################################################## 100.0%
-==> Pouring sqlite-3.11.0_1.yosemite.bottle.tar.gz
-==> Caveats
-This formula is keg-only, which means it was not symlinked into /usr/local.
+```
+[arun@arun-centos ~]$ sudo rpm -Uvh http://repos.mesosphere.com/el/7/noarch/RPMS/mesosphere-el-repo-7-1.noarch.rpm
 
-OS X provides an older sqlite3.
+We trust you have received the usual lecture from the local System
+Administrator. It usually boils down to these three things:
 
-Generally there are no consequences of this for you. If you build your
-own software and it requires this formula, you'll need to add to your
-build variables:
+    #1) Respect the privacy of others.
+    #2) Think before you type.
+    #3) With great power comes great responsibility.
 
-    LDFLAGS:  -L/usr/local/opt/sqlite/lib
-    CPPFLAGS: -I/usr/local/opt/sqlite/include
+[sudo] password for arun: 
+Retrieving http://repos.mesosphere.com/el/7/noarch/RPMS/mesosphere-el-repo-7-1.noarch.rpm
+warning: /var/tmp/rpm-tmp.9ssCDQ: Header V4 RSA/SHA1 Signature, key ID e56151bf: NOKEY
+Preparing...                          ################################# [100%]
+Updating / installing...
+   1:mesosphere-el-repo-7-1           ################################# [100%]
+```
 
-==> Summary
-🍺  /usr/local/Cellar/sqlite/3.11.0_1: 9 files, 2.8M
-==> Installing mesos dependency: openssl
-==> Downloading https://homebrew.bintray.com/bottles/openssl-1.0.2g.yosemite.bottle.tar.gz
-######################################################################## 100.0%
-==> Pouring openssl-1.0.2g.yosemite.bottle.tar.gz
-==> Caveats
-A CA file has been bootstrapped using certificates from the system
-keychain. To add additional certificates, place .pem files in
-  /usr/local/etc/openssl/certs
+=== Install Mesos + Marathon
 
-and run
-  /usr/local/opt/openssl/bin/c_rehash
+```
+[arun@arun-centos ~]$ sudo yum -y install mesos marathon
+Loaded plugins: fastestmirror, langpacks
+base                                                     | 3.6 kB     00:00     
+extras                                                   | 3.4 kB     00:00     
+mesosphere                                               | 2.9 kB     00:00     
+mesosphere-noarch                                        | 2.9 kB     00:00     
+updates                                                  | 3.4 kB     00:00     
+(1/6): base/7/x86_64/group_gz                              | 155 kB   00:00     
+(2/6): extras/7/x86_64/primary_db                          | 117 kB   00:00     
+(3/6): mesosphere-noarch/primary_db                        | 2.5 kB   00:00     
+(4/6): mesosphere/x86_64/primary_db                        |  27 kB   00:00     
+(5/6): base/7/x86_64/primary_db                            | 5.3 MB   00:01     
+(6/6): updates/7/x86_64/primary_db                         | 4.1 MB   00:02     
+Determining fastest mirrors
+ * base: mirror.supremebytes.com
+ * extras: centos.den.host-engine.com
+ * updates: mirror.hmc.edu
+Resolving Dependencies
+--> Running transaction check
+---> Package marathon.x86_64 0:1.1.1-1.0.472.el7 will be installed
+---> Package mesos.x86_64 0:0.28.1-2.0.20.centos701406 will be installed
+--> Processing Dependency: subversion for package: mesos-0.28.1-2.0.20.centos701406.x86_64
+--> Running transaction check
+---> Package subversion.x86_64 0:1.7.14-10.el7 will be installed
+--> Processing Dependency: subversion-libs(x86-64) = 1.7.14-10.el7 for package: subversion-1.7.14-10.el7.x86_64
+--> Processing Dependency: libsvn_wc-1.so.0()(64bit) for package: subversion-1.7.14-10.el7.x86_64
+--> Processing Dependency: libsvn_subr-1.so.0()(64bit) for package: subversion-1.7.14-10.el7.x86_64
+--> Processing Dependency: libsvn_repos-1.so.0()(64bit) for package: subversion-1.7.14-10.el7.x86_64
+--> Processing Dependency: libsvn_ra_svn-1.so.0()(64bit) for package: subversion-1.7.14-10.el7.x86_64
+--> Processing Dependency: libsvn_ra_neon-1.so.0()(64bit) for package: subversion-1.7.14-10.el7.x86_64
+--> Processing Dependency: libsvn_ra_local-1.so.0()(64bit) for package: subversion-1.7.14-10.el7.x86_64
+--> Processing Dependency: libsvn_ra-1.so.0()(64bit) for package: subversion-1.7.14-10.el7.x86_64
+--> Processing Dependency: libsvn_fs_util-1.so.0()(64bit) for package: subversion-1.7.14-10.el7.x86_64
+--> Processing Dependency: libsvn_fs_fs-1.so.0()(64bit) for package: subversion-1.7.14-10.el7.x86_64
+--> Processing Dependency: libsvn_fs_base-1.so.0()(64bit) for package: subversion-1.7.14-10.el7.x86_64
+--> Processing Dependency: libsvn_fs-1.so.0()(64bit) for package: subversion-1.7.14-10.el7.x86_64
+--> Processing Dependency: libsvn_diff-1.so.0()(64bit) for package: subversion-1.7.14-10.el7.x86_64
+--> Processing Dependency: libsvn_delta-1.so.0()(64bit) for package: subversion-1.7.14-10.el7.x86_64
+--> Processing Dependency: libsvn_client-1.so.0()(64bit) for package: subversion-1.7.14-10.el7.x86_64
+--> Processing Dependency: libaprutil-1.so.0()(64bit) for package: subversion-1.7.14-10.el7.x86_64
+--> Processing Dependency: libapr-1.so.0()(64bit) for package: subversion-1.7.14-10.el7.x86_64
+--> Running transaction check
+---> Package apr.x86_64 0:1.4.8-3.el7 will be installed
+---> Package apr-util.x86_64 0:1.5.2-6.el7 will be installed
+---> Package subversion-libs.x86_64 0:1.7.14-10.el7 will be installed
+--> Finished Dependency Resolution
 
-This formula is keg-only, which means it was not symlinked into /usr/local.
+Dependencies Resolved
 
-Apple has deprecated use of OpenSSL in favor of its own TLS and crypto libraries
+================================================================================
+ Package            Arch      Version                       Repository     Size
+================================================================================
+Installing:
+ marathon           x86_64    1.1.1-1.0.472.el7             mesosphere     64 M
+ mesos              x86_64    0.28.1-2.0.20.centos701406    mesosphere     30 M
+Installing for dependencies:
+ apr                x86_64    1.4.8-3.el7                   base          103 k
+ apr-util           x86_64    1.5.2-6.el7                   base           92 k
+ subversion         x86_64    1.7.14-10.el7                 base          1.0 M
+ subversion-libs    x86_64    1.7.14-10.el7                 base          921 k
 
-Generally there are no consequences of this for you. If you build your
-own software and it requires this formula, you'll need to add to your
-build variables:
+Transaction Summary
+================================================================================
+Install  2 Packages (+4 Dependent packages)
 
-    LDFLAGS:  -L/usr/local/opt/openssl/lib
-    CPPFLAGS: -I/usr/local/opt/openssl/include
+Total download size: 96 M
+Installed size: 168 M
+Downloading packages:
+warning: /var/cache/yum/x86_64/7/base/packages/apr-1.4.8-3.el7.x86_64.rpm: Header V3 RSA/SHA256 Signature, key ID f4a80eb5: NOKEY
+Public key for apr-1.4.8-3.el7.x86_64.rpm is not installed
+(1/6): apr-1.4.8-3.el7.x86_64.rpm                          | 103 kB   00:00     
+(2/6): apr-util-1.5.2-6.el7.x86_64.rpm                     |  92 kB   00:00     
+(3/6): subversion-1.7.14-10.el7.x86_64.rpm                 | 1.0 MB   00:00     
+(4/6): subversion-libs-1.7.14-10.el7.x86_64.rpm            | 921 kB   00:00     
+warning: /var/cache/yum/x86_64/7/mesosphere/packages/mesos-0.28.1-2.0.20.centos701406.x86_64.rpm: Header V4 RSA/SHA1 Signature, key ID e56151bf: NOKEY
+Public key for mesos-0.28.1-2.0.20.centos701406.x86_64.rpm is not installed
+(5/6): mesos-0.28.1-2.0.20.centos701406.x86_64.rpm         |  30 MB   00:29     
+(6/6): marathon-1.1.1-1.0.472.el7.x86_64.rpm               |  64 MB   00:36     
+--------------------------------------------------------------------------------
+Total                                              2.6 MB/s |  96 MB  00:36     
+Retrieving key from file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
+Importing GPG key 0xF4A80EB5:
+ Userid     : "CentOS-7 Key (CentOS 7 Official Signing Key) <security@centos.org>"
+ Fingerprint: 6341 ab27 53d7 8a78 a7c2 7bb1 24c6 a8a7 f4a8 0eb5
+ Package    : centos-release-7-2.1511.el7.centos.2.10.x86_64 (@anaconda)
+ From       : /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
+Retrieving key from file:///etc/pki/rpm-gpg/RPM-GPG-KEY-mesosphere
+Importing GPG key 0xE56151BF:
+ Userid     : "Mesosphere Archive Automatic Signing Key <support@mesosphere.io>"
+ Fingerprint: 8102 6d00 04c4 4cf7 ef55 adf8 df7d 54cb e561 51bf
+ Package    : mesosphere-el-repo-7-1.noarch (installed)
+ From       : /etc/pki/rpm-gpg/RPM-GPG-KEY-mesosphere
+Running transaction check
+Running transaction test
+Transaction test succeeded
+Running transaction
+  Installing : apr-1.4.8-3.el7.x86_64                                       1/6 
+  Installing : apr-util-1.5.2-6.el7.x86_64                                  2/6 
+  Installing : subversion-libs-1.7.14-10.el7.x86_64                         3/6 
+  Installing : subversion-1.7.14-10.el7.x86_64                              4/6 
+  Installing : mesos-0.28.1-2.0.20.centos701406.x86_64                      5/6 
+Created symlink from /etc/systemd/system/multi-user.target.wants/mesos-master.service to /usr/lib/systemd/system/mesos-master.service.
+Created symlink from /etc/systemd/system/multi-user.target.wants/mesos-slave.service to /usr/lib/systemd/system/mesos-slave.service.
+  Installing : marathon-1.1.1-1.0.472.el7.x86_64                            6/6 
+Created symlink from /etc/systemd/system/multi-user.target.wants/marathon.service to /usr/lib/systemd/system/marathon.service.
+  Verifying  : apr-1.4.8-3.el7.x86_64                                       1/6 
+  Verifying  : subversion-1.7.14-10.el7.x86_64                              2/6 
+  Verifying  : apr-util-1.5.2-6.el7.x86_64                                  3/6 
+  Verifying  : mesos-0.28.1-2.0.20.centos701406.x86_64                      4/6 
+  Verifying  : marathon-1.1.1-1.0.472.el7.x86_64                            5/6 
+  Verifying  : subversion-libs-1.7.14-10.el7.x86_64                         6/6 
 
-==> Summary
-🍺  /usr/local/Cellar/openssl/1.0.2g: 466 files, 11.9M
-==> Installing mesos dependency: subversion
-==> Downloading https://homebrew.bintray.com/bottles/subversion-1.9.3.yosemite.bottle.1.tar.gz
-######################################################################## 100.0%
-==> Pouring subversion-1.9.3.yosemite.bottle.1.tar.gz
-==> Caveats
-svntools have been installed to:
-  /usr/local/opt/subversion/libexec
+Installed:
+  marathon.x86_64 0:1.1.1-1.0.472.el7 mesos.x86_64 0:0.28.1-2.0.20.centos701406
 
-Bash completion has been installed to:
-  /usr/local/etc/bash_completion.d
-==> Summary
-🍺  /usr/local/Cellar/subversion/1.9.3: 132 files, 11.1M
-==> Installing mesos
-==> Downloading https://homebrew.bintray.com/bottles/mesos-0.27.2.yosemite.bottle.tar.gz
-######################################################################## 100.0%
-==> Pouring mesos-0.27.2.yosemite.bottle.tar.gz
-🍺  /usr/local/Cellar/mesos/0.27.2: 841 files, 85.3M
-----
+Dependency Installed:
+  apr.x86_64 0:1.4.8-3.el7             apr-util.x86_64 0:1.5.2-6.el7            
+  subversion.x86_64 0:1.7.14-10.el7    subversion-libs.x86_64 0:1.7.14-10.el7   
 
-=== Start Mesos Master
+Complete!
+```
 
-[source, text]
-----
-/usr/local/sbin/mesos-master --registry=in_memory --ip=127.0.0.1 --zk=zk://127.0.0.1:2181/mesos --quorum=1
-----
+=== Install ZooKeeper
 
-Mesos Web UI: http://127.0.0.1:5050/
+```
+[arun@arun-centos ~]$ sudo yum -y install mesosphere-zookeeper
+[sudo] password for arun: 
+Loaded plugins: fastestmirror, langpacks
+Loading mirror speeds from cached hostfile
+ * base: mirror.supremebytes.com
+ * extras: centos.den.host-engine.com
+ * updates: mirror.hmc.edu
+Resolving Dependencies
+--> Running transaction check
+---> Package mesosphere-zookeeper.x86_64 0:3.4.6-0.1.20141204175332.centos7 will be installed
+--> Finished Dependency Resolution
 
-=== Start Mesos Slave
+Dependencies Resolved
 
-[source, text]
-----
-/usr/local/sbin/mesos-slave --master=127.0.0.1:5050 --containerizers=docker,mesos --executor_registration_timeout=5mins
-----
+==================================================================================================
+ Package                  Arch       Version                                 Repository      Size
+==================================================================================================
+Installing:
+ mesosphere-zookeeper     x86_64     3.4.6-0.1.20141204175332.centos7        mesosphere     2.8 M
 
-== Marathon
+Transaction Summary
+==================================================================================================
+Install  1 Package
 
-[source, text]
-----
-curl -O http://downloads.mesosphere.com/marathon/v1.0.0-RC1/marathon-1.0.0-RC1.tgz
-tar xzvf marathon-1.0.0-RC1.tgz
-cd marathon-1.0.0-RC1
-./bin/start --master zk://127.0.0.1:2181/mesos --zk zk://127.0.0.1:2181/marathon
-----
+Total download size: 2.8 M
+Installed size: 3.5 M
+Downloading packages:
+mesosphere-zookeeper-3.4.6-0.1.20141204175332.centos7.x86_64.rpm           | 2.8 MB  00:00:01     
+Running transaction check
+Running transaction test
+Transaction test succeeded
+Running transaction
+  Installing : mesosphere-zookeeper-3.4.6-0.1.20141204175332.centos7.x86_64                   1/1 
+Created symlink from /etc/systemd/system/multi-user.target.wants/zookeeper.service to /usr/lib/systemd/system/zookeeper.service.
+  Verifying  : mesosphere-zookeeper-3.4.6-0.1.20141204175332.centos7.x86_64                   1/1 
+
+Installed:
+  mesosphere-zookeeper.x86_64 0:3.4.6-0.1.20141204175332.centos7                                  
+
+Complete!
+```
+
+=== Add Docker repo
+
+```
+[arun@arun-centos ~]$ sudo tee /etc/yum.repos.d/docker.repo <<-'EOF'
+[dockerrepo]
+name=Docker Repository
+baseurl=https://yum.dockerproject.org/repo/main/centos/$releasever/
+enabled=1
+gpgcheck=1
+gpgkey=https://yum.dockerproject.org/gpg
+EOF
+[sudo] password for arun: 
+[dockerrepo]
+name=Docker Repository
+baseurl=https://yum.dockerproject.org/repo/main/centos/$releasever/
+enabled=1
+gpgcheck=1
+gpgkey=https://yum.dockerproject.org/gpg
+```
+
+=== Install Docker
+
+
+```
+[arun@localhost ~]$ sudo yum -y install docker-engine
+Loaded plugins: fastestmirror, langpacks
+Loading mirror speeds from cached hostfile
+ * base: mirror.scalabledns.com
+ * extras: linux.mirrors.es.net
+ * updates: mirrors.adams.net
+Resolving Dependencies
+--> Running transaction check
+---> Package docker-engine.x86_64 0:1.11.1-1.el7.centos will be installed
+--> Processing Dependency: docker-engine-selinux >= 1.11.1-1.el7.centos for package: docker-engine-1.11.1-1.el7.centos.x86_64
+--> Running transaction check
+---> Package docker-engine-selinux.noarch 0:1.11.1-1.el7.centos will be installed
+--> Finished Dependency Resolution
+
+Dependencies Resolved
+
+====================================================================================================
+ Package                       Arch           Version                      Repository          Size
+====================================================================================================
+Installing:
+ docker-engine                 x86_64         1.11.1-1.el7.centos          dockerrepo          13 M
+Installing for dependencies:
+ docker-engine-selinux         noarch         1.11.1-1.el7.centos          dockerrepo          28 k
+
+Transaction Summary
+====================================================================================================
+Install  1 Package (+1 Dependent package)
+
+Total download size: 13 M
+Installed size: 54 M
+Downloading packages:
+warning: /var/cache/yum/x86_64/7/dockerrepo/packages/docker-engine-selinux-1.11.1-1.el7.centos.noarch.rpm: Header V4 RSA/SHA512 Signature, key ID 2c52609d: NOKEY
+Public key for docker-engine-selinux-1.11.1-1.el7.centos.noarch.rpm is not installed
+(1/2): docker-engine-selinux-1.11.1-1.el7.centos.noarch.rpm                  |  28 kB  00:00:00     
+(2/2): docker-engine-1.11.1-1.el7.centos.x86_64.rpm                          |  13 MB  00:00:02     
+----------------------------------------------------------------------------------------------------
+Total                                                               5.3 MB/s |  13 MB  00:00:02     
+Retrieving key from https://yum.dockerproject.org/gpg
+Importing GPG key 0x2C52609D:
+ Userid     : "Docker Release Tool (releasedocker) <docker@docker.com>"
+ Fingerprint: 5811 8e89 f3a9 1289 7c07 0adb f762 2157 2c52 609d
+ From       : https://yum.dockerproject.org/gpg
+Running transaction check
+Running transaction test
+Transaction test succeeded
+Running transaction
+  Installing : docker-engine-selinux-1.11.1-1.el7.centos.noarch                                 1/2 
+restorecon:  lstat(/var/lib/docker) failed:  No such file or directory
+warning: %post(docker-engine-selinux-1.11.1-1.el7.centos.noarch) scriptlet failed, exit status 255
+Non-fatal POSTIN scriptlet failure in rpm package docker-engine-selinux-1.11.1-1.el7.centos.noarch
+  Installing : docker-engine-1.11.1-1.el7.centos.x86_64                                         2/2 
+  Verifying  : docker-engine-1.11.1-1.el7.centos.x86_64                                         1/2 
+  Verifying  : docker-engine-selinux-1.11.1-1.el7.centos.noarch                                 2/2 
+
+Installed:
+  docker-engine.x86_64 0:1.11.1-1.el7.centos                                                        
+
+Dependency Installed:
+  docker-engine-selinux.noarch 0:1.11.1-1.el7.centos                                                
+
+Complete!
+```
+
+== Configure hostname/IP address mapping
+
+Edit `/etc/hosts/` and create hostname and IP address mapping. Find IP address using `ifconfig` and choose the network interface enabled earlier.
+
+== Start services
+
+=== Start Docker
+
+```
+[arun@arun-centos ~]$ sudo service docker start
+Redirecting to /bin/systemctl start  docker.service
+```
+=== Start ZooKeeper
+
+```
+sudo systemctl start zookeeper
+```
+=== Start Mesos master
+
+```
+[arun@arun-centos ~]$ sudo service mesos-master start
+[sudo] password for arun: 
+Redirecting to /bin/systemctl start  mesos-master.service
+```
+
+=== Start Mesos slave
+
+Configure `mesos` and `docker` containerizers:
+
+```
+sudo sh -c "echo 'docker,mesos' > /etc/mesos-slave/containerizers"
+```
+
+Start slave:
+
+```
+[arun@arun-centos ~]$ sudo service mesos-slave start
+Redirecting to /bin/systemctl start  mesos-slave.service
+```
+
+
+=== Start Marathon
+
+```
+[arun@arun-centos ~]$ sudo service marathon start
+Redirecting to /bin/systemctl start  marathon.service
+```
+
+=== Check for services
+
+```
+[arun@arun-centos log]$ ps aux | grep meso
+root      4511  0.1  0.7 3974136 58968 ?       Ssl  19:54   0:04 java -Dzookeeper.log.dir=. -Dzookeeper.root.logger=INFO,CONSOLE -cp /opt/mesosphere/zookeeper/bin/../build/classes:/opt/mesosphere/zookeeper/bin/../build/lib/*.jar:/opt/mesosphere/zookeeper/bin/../lib/slf4j-log4j12-1.6.1.jar:/opt/mesosphere/zookeeper/bin/../lib/slf4j-api-1.6.1.jar:/opt/mesosphere/zookeeper/bin/../lib/netty-3.7.0.Final.jar:/opt/mesosphere/zookeeper/bin/../lib/log4j-1.2.16.jar:/opt/mesosphere/zookeeper/bin/../lib/jline-0.9.94.jar:/opt/mesosphere/zookeeper/bin/../zookeeper-3.4.6.jar:/opt/mesosphere/zookeeper/bin/../src/java/lib/*.jar:/etc/zookeeper/conf: -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.local.only=false org.apache.zookeeper.server.quorum.QuorumPeerMain /etc/zookeeper/conf/zoo.cfg
+root     15786  0.0  0.2 754788 19596 ?        Ssl  20:43   0:00 /usr/sbin/mesos-slave --master=zk://localhost:2181/mesos --log_dir=/var/log/mesos
+root     15792  0.0  0.0 107892   624 ?        S    20:43   0:00 logger -p user.info -t mesos-slave[15786]
+root     15793  0.0  0.0 107892   700 ?        S    20:43   0:00 logger -p user.err -t mesos-slave[15786]
+root     15837  1.9  3.0 2818056 239208 ?      Ssl  20:43   0:10 java -Djava.library.path=/usr/local/lib:/usr/lib:/usr/lib64 -Djava.util.logging.SimpleFormatter.format=%2$s%5$s%6$s%n -Xmx512m -cp /usr/bin/marathon mesosphere.marathon.Main --zk zk://localhost:2181/marathon --master zk://localhost:2181/mesos
+root     15838  0.0  0.2 829028 22908 ?        Ssl  20:43   0:00 /usr/sbin/mesos-master --zk=zk://localhost:2181/mesos --port=5050 --log_dir=/var/log/mesos --quorum=1 --work_dir=/var/lib/mesos
+root     15863  0.0  0.0 107892   620 ?        S    20:43   0:00 logger -p user.info -t mesos-master[15838]
+root     15864  0.0  0.0 107892   696 ?        S    20:43   0:00 logger -p user.err -t mesos-master[15838]
+arun     16931  0.0  0.0 112644   952 pts/0    R+   20:52   0:00 grep --color=auto meso
+```
+
+Mesos UI: http://127.0.0.1:5050
+Marathon UI: http://127.0.0.1:8080
+Logs: `tail -f /var/log/messages`
+
+==== Check Mesos master
+
+```
+[arun@arun-centos ~]$ systemctl status mesos-master
+● mesos-master.service - Mesos Master
+   Loaded: loaded (/usr/lib/systemd/system/mesos-master.service; enabled; vendor preset: disabled)
+   Active: active (running) since Wed 2016-05-04 19:42:24 EDT; 32min ago
+ Main PID: 8499 (mesos-master)
+   Memory: 14.6M
+   CGroup: /system.slice/mesos-master.service
+           ├─8499 /usr/sbin/mesos-master --zk=zk://localhost:2181/mesos --port=5050 --log_dir=/va...
+           ├─8513 logger -p user.info -t mesos-master[8499]
+           └─8514 logger -p user.err -t mesos-master[8499]
+
+May 04 20:14:41 arun-centos mesos-master[8514]: I0504 20:14:41.564679  8527 master.cpp:3104] Proc...
+May 04 20:14:41 arun-centos mesos-master[8514]: I0504 20:14:41.565058  8527 master.hpp:177] Ad...os)
+May 04 20:14:41 arun-centos mesos-master[8514]: I0504 20:14:41.565093  8527 master.cpp:3589] Laun...
+May 04 20:14:41 arun-centos mesos-master[8514]: I0504 20:14:41.577255  8527 master.cpp:4763] Stat...
+May 04 20:14:41 arun-centos mesos-master[8514]: I0504 20:14:41.577287  8527 master.cpp:4811] F...000
+May 04 20:14:41 arun-centos mesos-master[8514]: I0504 20:14:41.577325  8527 master.cpp:6421] U...ED)
+May 04 20:14:41 arun-centos mesos-master[8514]: I0504 20:14:41.587143  8527 master.cpp:3918] Proc...
+May 04 20:14:41 arun-centos mesos-master[8514]: I0504 20:14:41.587198  8527 master.cpp:6487] Remo...
+May 04 20:14:41 arun-centos mesos-master[8514]: I0504 20:14:41.726095  8527 master.cpp:5324] S...006
+May 04 20:14:41 arun-centos mesos-master[8514]: I0504 20:14:41.728080  8527 master.cpp:3641] P...006
+Hint: Some lines were ellipsized, use -l to show in full.
+```
+
+==== Check Mesos slave
+
+```
+[arun@arun-centos ~]$ systemctl status mesos-slave
+● mesos-slave.service - Mesos Slave
+   Loaded: loaded (/usr/lib/systemd/system/mesos-slave.service; enabled; vendor preset: disabled)
+   Active: active (running) since Wed 2016-05-04 20:00:43 EDT; 12min ago
+ Main PID: 9864 (mesos-slave)
+   Memory: 57.5M
+   CGroup: /system.slice/mesos-slave.service
+           ├─9864 /usr/sbin/mesos-slave --master=zk://localhost:2181/mesos --log_dir=/var/log/mes...
+           ├─9876 logger -p user.info -t mesos-slave[9864]
+           └─9877 logger -p user.err -t mesos-slave[9864]
+
+May 04 20:13:26 arun-centos mesos-slave[9877]: I0504 20:13:26.283629  9887 status_update_manag...000
+May 04 20:13:26 arun-centos mesos-slave[9877]: I0504 20:13:26.289118  9887 slave.cpp:3990] Cle...000
+May 04 20:13:26 arun-centos mesos-slave[9877]: I0504 20:13:26.289422  9887 slave.cpp:4078] Cle...000
+May 04 20:13:26 arun-centos mesos-slave[9877]: I0504 20:13:26.289459  9887 gc.cpp:55] Scheduling ...
+May 04 20:13:26 arun-centos mesos-slave[9877]: I0504 20:13:26.289489  9887 gc.cpp:55] Scheduli...ure
+May 04 20:13:26 arun-centos mesos-slave[9877]: I0504 20:13:26.289499  9887 gc.cpp:55] Scheduling ...
+May 04 20:13:26 arun-centos mesos-slave[9877]: I0504 20:13:26.289511  9887 gc.cpp:55] Scheduli...ure
+May 04 20:13:26 arun-centos mesos-slave[9877]: I0504 20:13:26.289520  9887 gc.cpp:55] Scheduli...ure
+May 04 20:13:26 arun-centos mesos-slave[9877]: I0504 20:13:26.289525  9887 gc.cpp:55] Scheduli...ure
+May 04 20:13:26 arun-centos mesos-slave[9877]: I0504 20:13:26.289533  9887 status_update_manag...000
+Hint: Some lines were ellipsized, use -l to show in full.
+```
+==== Check ZooKeeper
+
+```
+[arun@arun-centos log]$ /opt/mesosphere/zookeeper/bin/zkCli.sh
+Connecting to localhost:2181
+log4j:WARN No appenders could be found for logger (org.apache.zookeeper.ZooKeeper).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+Welcome to ZooKeeper!
+JLine support is enabled
+
+WATCHER::
+
+WatchedEvent state:SyncConnected type:None path:null
+[zk: localhost:2181(CONNECTED) 0] ls /mesos
+[json.info_0000000001, log_replicas]
+
+```
+
+== Deploy Docker app to Mesos + Marathon
+
+App: https://mesosphere.github.io/marathon/docs/application-basics.html#a-simple-docker-based-application
+
+Use the following file:
+
+```
+{
+  "id": "basic-3",
+  "cmd": "python3 -m http.server $PORT0",
+  "cpus": 0.5,
+  "mem": 32.0,
+  "container": {
+    "type": "DOCKER",
+    "docker": {
+      "image": "python:3",
+      "forcePullImage": true,
+      "network": "BRIDGE",
+      "portMappings": [
+        { "containerPort": 0, "hostPort": 0 }
+      ]
+    }
+  }
+}
+```
+
+Deploy the app as:
+
+```
+curl -X POST http://127.0.0.1:8080/v2/apps -d @app.json -H "Content-type: application/json"
+```
+
+== Output
+
+```
+[arun@localhost ~]$ sudo docker images
+[sudo] password for arun: 
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+python              3                   67b5207e5d3b        8 days ago          671.1 MB
+[arun@localhost ~]$ sudo docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                      NAMES
+2ee42b120537        python:3            "/bin/sh -c 'python3 "   About an hour ago   Up About an hour    0.0.0.0:31669->31669/tcp   mesos-d03f6e61-063f-4cae-9c1b-3fc6d8384b3a-S0.b99d82f6-9bc1-4a6f-ae3b-53b7f5d06b95
+```
+
+== NOTES
+
+. https://mesosphere.github.io/marathon/docs/ports.html
+. Mesos CLI: http://mesos.apache.org/documentation/latest/configuration/
+. Mesos under the hood: https://open.mesosphere.com/advanced-course/
 
