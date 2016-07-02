@@ -1,3 +1,4 @@
 = Docker for Java Developers Report by O''Reilly
 
-More details: TBD
+Book is available at: http://shop.oreilly.com/product/0636920050872.do
+
