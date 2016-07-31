@@ -1,0 +1,24 @@
+version: "2"
+services:
+  # db:
+  #   image: arungupta/oreilly-couchbase:latest
+  #   ports:
+  #     - 8091:8091
+  #     - 8092:8092 
+  #     - 8093:8093 
+  #     - 11210:11210
+  # web:
+  #   image: arungupta/oreilly-wildfly:latest
+  #   depends_on:
+  #     - db
+  #   environment:
+  #     - COUCHBASE_URI=db
+  web:
+    image: jboss/wildfly
+    # environment:
+    #   - COUCHBASE_URI=db
+  lb:
+    image: nginx
+    # command: ["nginx", "reload"]
+    ports:
+      - 80:80
