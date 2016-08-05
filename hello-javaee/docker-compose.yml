@@ -1,7 +1,6 @@
 version: "2"
 services:
   db:
-    container_name: "db"
     image: arungupta/oreilly-couchbase:latest
     ports:
       - 8091:8091
