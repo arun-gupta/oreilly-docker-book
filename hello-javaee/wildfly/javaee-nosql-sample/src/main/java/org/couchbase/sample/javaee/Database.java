@@ -44,15 +44,17 @@ public class Database {
             // Docker environment
             String couchbaseHost = System.getenv("COUCHBASE_URI");
             if (couchbaseHost == null) {
-                System.out.println("Docker configuration not found, reading Kubernetes configuration ...");
+                System.out.println("Docker configuration not found, trying Kubernetes configuration ...");
                 // Kubernetes environment
                 couchbaseHost = System.getenv("COUCHBASE_SERVICE_SERVICE_HOST");
-                if (couchbaseHost == null)
-                    System.out.println("Kubernetes configuration not found");
-                else
+                if (couchbaseHost == null) {
+                    System.out.println("Kubernetes configuration not found, using default value ...");
+                    couchbaseHost = "localhost";
+                } else {
                     System.out.println("Kubernetes configuration found");
+                }
             }
-            System.out.println("couchbaseHost: " + couchbaseHost);
+            System.out.println("Couchbase Host: " + couchbaseHost);
             cluster = CouchbaseCluster.create(couchbaseHost);
         }
         return cluster;
