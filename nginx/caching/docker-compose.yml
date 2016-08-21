@@ -1,0 +1,9 @@
+version: "2"
+services:
+  web:
+    image: jboss/wildfly
+  lb:
+    image: arungupta/oreilly-nginx-caching
+    ports:
+      - 80:80
+      - 8080:8080
