@@ -1,4 +1,4 @@
-FROM java
+FROM openjdk
 
 CMD ["java", "-version"]
 
